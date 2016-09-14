@@ -1,0 +1,9 @@
+.container {
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+  float: left; }
+
+.container2 {
+  z-index: 999;
+  width: 100px; }
