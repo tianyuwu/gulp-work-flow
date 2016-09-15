@@ -1,9 +1,140 @@
+
 <!DOCTYPE html>
 <html>
-<head>
-	<title></title>
-</head>
-<body>
+  <head>
+    <meta charset="utf-8">
+    <title>gulp-work-flow</title>
+    <link rel="stylesheet" type="text/css" href="/public/github.css">
+  </head>
+  <body>
+    <div class="container">
+      <div id="markup">
+        <article id="content" class="markdown-body">
+          <h2>gulp-work-flow 前端工作流，原来可以这么简单！</h2>
+<h3>概述</h3>
+<p>最近前端一直是一个火热的话题，前端技术栈也是伴随着nodejs的出现而更替的飞快，导致大部分前端开发者曾一度迷茫在这各种技术选型上，比如前端自动化工具就有Grunt，Gulp，Webpack，Fis3等等各种解决方案，关于它们的优劣也有很多大牛的深度剖析和见解，相信很多人和笔者一样，很想紧跟上潮流的步伐却因乱花渐欲迷人眼而止步当前。</p>
+<p>无奈笔者倔强，在多次拿起放下的纠结之后，终究是寻得一些灵感和启发，得以驾驭其一二。
+话不多说，今天的主题是：使用Gulp打造传统项目的前端工作流。</p>
+<p>可能很多开发者像我一样依然还服务于传统的MVC架构的项目，这些项目的特点是html页面由后台渲染，前端工程师和后端工程师在一个工程中和（si）谐（bi）的生活着，前端开发简单而又轻松，拼拼页面，写写特效，可能还会用用后端语法渲染下数据。那么问题来了，我想用sass或者less怎么办？我想写ES6怎么办？js文件太大需要压缩怎么办？现在，这些问题将统统可以解决。</p>
+<h3>Gulp</h3>
+<p>gulp是nodejs的一个扩展库，是一个自动化的构建工具，它的优势是拥有丰富的插件，利用插件我们可以实现像sass编译，ES6转换为ES5等各种前端工作。API不多，只有简单的几个函数，官方有简洁友好的中文跟文档。</p>
+<ul>
+<li><a href="http://www.gulpjs.com.cn/docs/getting-started/">gulp快速入门</a></li>
+<li><a href="http://www.gulpjs.com.cn/docs/api/">gulpAPI文档</a></li>
+</ul>
+<h3>编译Sass</h3>
+<p>sass是一个css的预处理器，它由很多很棒的特性比如支持变量，支持文件引入，支持样式嵌套继承等等，可以大大提升我们的css书写效率。
+sass依赖ruby环境，单独安装sass的话就存在着一个麻烦的环境部署问题，好在gulp拥有<code>gulp-sass</code>插件可以帮我们进行转换而省去了安装ruby的繁琐工作,下边是笔者的sass编译任务</p>
+<div class="codehilite"><pre>//gulp插件
+var gulp = require(&#39;gulp&#39;),
+    sass = require(&#39;gulp-sass&#39;);
 
-</body>
+...
+//sass编译
+gulp.task(&#39;sass&#39;, function(){
+    return gulp.src(&#39;/**/*.scss&#39;)
+    .pipe( sass() )                  //编译sass
+    .pipe( gulp.dest(&#39;/build/css&#39;) ) //编译后文件存放目录
+});
+</pre></div>
+
+
+<p>是不是很简单呢，当然我们还可以顺便做个css压缩，自动添加浏览器前缀的功能，开发的时候还需要实时编译，所以我们再增加一个监听插件<code>gulp-watch</code>,完整的css处理任务如下：</p>
+<p>安装所有gulp的插件</p>
+<div class="codehilite"><pre>npm install --save-dev gulp gulp-sass gulp-autoprefixer gulp-cssnano gulp-rename gulp-watch
+</pre></div>
+
+
+<p>编写gulpfile.js文件</p>
+<div class="codehilite"><pre>//gulp插件
+var gulp = require(&#39;gulp&#39;),
+    sass = require(&#39;gulp-sass&#39;),
+    autoprefixer = require(&#39;gulp-autoprefixer&#39;),
+    cssnano = require(&#39;gulp-cssnano&#39;),  //css压缩
+    rename = require(&#39;gulp-rename&#39;),
+    watch = require(&#39;gulp-watch&#39;);
+
+...
+
+gulp.task(&#39;sass&#39;, function(){
+    return gulp.src(sasspath)
+    .pipe( watch(sasspath))   //监听gulp.watch不能监听新增文件
+    .pipe( sass() )  //编译sass
+    .pipe( autoprefixer())  //添加浏览器前缀
+    .pipe( gulp.dest(disCssPath) )
+    .pipe( cssnano() )
+    .pipe( rename({suffix: &#39;.min&#39;}))   //rename压缩后的文件名
+    .pipe( gulp.dest(disCssPath) );
+});
+</pre></div>
+
+
+<p>命令行中执行gulp命令</p>
+<div class="codehilite"><pre>gulp sass
+</pre></div>
+
+
+<p>任务完成后在目标目录可以看到编译后生成的压缩和未压缩的样式文件</p>
+<div class="codehilite"><pre>├── css
+│   ├── index.css
+│   ├── index.min.css
+│   ├── test.css
+│   └── test.min.css
+</pre></div>
+
+
+<h3>ES6 -&gt; ES5</h3>
+<p>ES6指ECMAScript 6，也叫ECMAScript 2015，是JavaScript语言的新一代标准，已经在2015年6月正式发布了。它的目标，是使得JavaScript语言可以用来编写复杂的大型应用程序，成为企业级开发语言。他提出了很多现代编程语言的很多新特性，包括变量，数组，函数，对象等等都做了扩展，笔者也还在学习当中，推荐一份阮一峰大大写的ES6的电子书。</p>
+<p><a href="http://es6.ruanyifeng.com/">ECMAScript 6入门</a></p>
+<p>当然目前的浏览器对ES6支持度还不是很完美，所以不能直接交给浏览器解析使用。那么新问题来了，我们需要进行转码。</p>
+<blockquote>
+<p>babel是一个广泛使用的ES6转码器，可以将ES6代码转为ES5代码，从而在现有环境执行。这意味着，你可以用ES6的方式编写程序，又不用担心现有环境是否支持。</p>
+</blockquote>
+<p>上边电子书中详细的讲述了如何安装和使用babel进行转码，但是今天我们依然不讲它，gulp有对应的插件可以解决，那就是<code>gulp-babel</code>，同样的，我们还可以顺便利用<code>gulp-uglify</code>对编译后的js文件进行压缩，事情可以依然优雅的解决：</p>
+<p>安装babel和对应的转码规则扩展组件</p>
+<div class="codehilite"><pre>npm install --save-dev  gulp-babel babel-preset-es2015 babel-preset-stage-3
+</pre></div>
+
+
+<p>修改gulpfile.js</p>
+<div class="codehilite"><pre>...
+
+var babel = require(&#39;gulp-babel&#39;),
+    uglify = require(&#39;gulp-uglify&#39;);
+
+...
+
+//编译js
+gulp.task(&#39;js&#39;,function(){
+    return gulp.src(jspath)
+    .pipe( watch(jspath))
+    .pipe(babel({
+      presets: [&#39;es2015&#39;,&#39;stage-3&#39;]
+    }))  //babel转码
+    .pipe( gulp.dest(disJsPath) )
+    .pipe(uglify())  //压缩
+    .pipe( rename({suffix: &#39;.min&#39;}))
+    .pipe( gulp.dest(disJsPath) );
+});
+</pre></div>
+
+
+<p>同样的，执行对应的gulp命令</p>
+<div class="codehilite"><pre>gulp js
+</pre></div>
+
+
+<p>任务完成后会在目标目录增加编译后的js文件</p>
+<div class="codehilite"><pre>└── js
+    ├── index.js
+    └── index.min.js
+</pre></div>
+
+
+<p>以上演示代码只是部分，不是完整的，仅供参考，如果想快速在自己项目中使用可以下载本文对应的源码</p>
+<p><a href="https://github.com/tianyuwu/gulp-work-flow">gulp-work-flow 前端工作流原来可以这么简单</a></p>
+        </article>
+      </div>
+    </div>
+  </body>
 </html>

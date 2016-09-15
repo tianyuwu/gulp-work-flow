@@ -90,10 +90,6 @@ gulp.task('default', ['clean'], function () {
 });
 
 
-
-gulp.task('build',['sass','js']);
-
-
 //创建文件夹
 function mkdirs(dirpath, mode) { 
     if (!fs.existsSync(dirpath)) {

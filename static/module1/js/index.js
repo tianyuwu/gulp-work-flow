@@ -23,5 +23,5 @@ var Point = function () {
   return Point;
 }();
 
-var b = new Point(4500, 400);
+var b = new Point(400, 500);
 b.toString();
