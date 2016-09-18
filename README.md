@@ -83,11 +83,11 @@ git clone https://github.com/tianyuwu/gulp-work-flow
 
 #### 安装所有的依赖
 ```
-npm init
+npm install
 ```
 
 #### 修改gulpfile.js
-将module_name改为你项目中对应的模块名，可以天下一个新的不存在的模块，build_path也改为你项目中对应的输出目录
+将module_name改为你项目中对应的模块名，可以添加一个新的不存在的模块，build_path也改为你项目中对应的输出目录
 ```
 var module_name = 'module1';   //监听的模块名
 var dev_path = './src';        //资源目录
